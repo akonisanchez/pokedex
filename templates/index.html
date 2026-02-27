@@ -8,6 +8,12 @@
   <body>
     <h1>Pokédex</h1>
     <p>Welcome, Trainer.</p>
-    <p>Your journey to become a Pokémon Master begins here.</p>
+
+    <form action="/pokemon" method="get">
+      <label for ="name">Enter Pokemon name:</label>
+      <input type="text" id="name" name="name" required>
+      <button type="submit">Search</button>
+    </form>
+  
   </body>
 </html>
