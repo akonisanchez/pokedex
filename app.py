@@ -50,6 +50,15 @@ def show_pokemon():
         "height": data["height"],
         "weight": data["weight"],
         "sprite": data["sprites"] ["front_default"],
+
+        # Ex: ["Grass"] or if multiple types ["Grass", "Fighting"]
+        "types": [t["type"] ["name"].title() for t in data ["types"]],
+
+        # Ex: [{"name": "HP", "value": 45}, ...]
+        "stats": [
+            {"name": s["stat"] ["name"].replace("-", " ").title(), "value": s["base_stat"]}
+            for s in data["stats"]
+        ],
     }
 
     return render_template("pokemon.html", pokemon=pokemon)

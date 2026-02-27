@@ -22,6 +22,22 @@
 
       <p>Height: {{ pokemon.height}} </p>
       <p>Weight: {{ pokemon.weight}} </p>
+      
+      <!-- Types -->
+       <h3>Type(s)</h3>
+       <ul>
+        {% for t in pokemon.types %}
+          <li>{{ t }}</li>
+        {% endfor %}
+       </ul>
+
+       <!-- Base stats -->
+        <h3>Base Stats</h3>
+        <ul>
+          {% for stat in pokemon.stats %}
+            <li>{{ stat.name }}: {{ stat.value }}</li>
+          {% endfor %}
+        </ul>
     {% endif %}
 
     <!-- Navigation link back to homepage -->
