@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 # Create the Pokedex web application
 app = Flask(__name__)
@@ -7,11 +7,7 @@ app = Flask(__name__)
 # This runs when someone visits the root URL
 @app.get("/")
 def pokedex_home():
-    return """
-    <h1>Pokedex</h1>
-    <p>Welcome, Trainer.</p>
-    <p>Your journey to become a Pokemon Master begins here.</p>
-    """
+    return render_template("index.html")
 
 # Start the server
 if __name__ == "__main__":
