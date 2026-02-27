@@ -6,15 +6,25 @@
   </head>
 
   <body>
-
     <!-- Page title -->
     <h1>Pokédex Result</h1>
 
-    <!-- "name" is passed from Flask: render_template("pokemon.html", name=name) -->
-    <h2>You searched for: {{ name }}</h2>
+    {% if error %}
+      <!-- Backend sets "error when pokemon can't be found -->
+      <p>{{ error }}</p>
+    {% else %}
+      <!-- "pokemon" is passed in from Flask (a dict of details) -->
+      <h2>{{ pokemon.name }}</h2>
+
+      {% if pokemon.sprite %}
+        <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
+      {% endif %}
+
+      <p>Height: {{ pokemon.height}} </p>
+      <p>Weight: {{ pokemon.weight}} </p>
+    {% endif %}
 
     <!-- Navigation link back to homepage -->
-    <a href="/">Search again</a>
-
+    <p><a href="/">Search again</a></p>
   </body>
 </html>
