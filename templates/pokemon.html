@@ -38,6 +38,16 @@
             <li>{{ stat.name }}: {{ stat.value }}</li>
           {% endfor %}
         </ul>
+
+        <!-- Form to save Pokemon to favorites -->
+        <form action="/favorites/add" method="post">
+
+          <!-- Hidden input sends Pokemon name to backend -->
+          <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+
+          <button type="submit">Save to Favorites</button>
+
+        </form>
     {% endif %}
 
     <!-- Navigation link back to homepage -->

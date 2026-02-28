@@ -86,6 +86,38 @@ def show_favorites():
 
     return render_template("favorites.html", favorites=favorites)
 
+@app.post("/favorites/add")
+def add_favorite():
+    """
+    Save a Pokemon to the favorites database.
+
+    This route receives a POST request from the results page form
+    and inserts the Pokemon name into the favorites table.
+    """
+
+    # Get Pokemon name from submitted form data
+    pokemon_name = request.form.get("name", "").strip().lower()
+
+    # Guard against empty submissions
+    if not pokemon_name:
+        return redirect(url_for("pokedex_home"))
+
+    conn = sqlite3.connect("pokedex.db")
+    cursor = conn.cursor()
+
+    try:
+        # INSERT OR IGNORE prevents duplicate entries
+        cursor.execute(
+            "INSERT OR IGNORE INTO favorites (name) VALUES (?)",
+            (pokemon_name,)
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    # Redirect user to favorites page after saving
+    return redirect(url_for("show_favorites"))
+
 # Start the server
 if __name__ == "__main__":
     app.run(debug=True)
