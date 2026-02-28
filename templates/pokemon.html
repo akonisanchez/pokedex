@@ -21,7 +21,12 @@
 
               <div class="mb-3">
                 {% for t in pokemon.types %}
-                  <span class="badge text-bg-primary badge-type me-1">{{ t }}</span>
+                 <span
+                   class="badge badge-type me-1"
+                   style="background-color: {{ type_styles[t].bg }}; color: {{ type_styles[t].fg }};"
+                 >
+                   {{ t }}
+                 </span>
                 {% endfor %}
               </div>
 
