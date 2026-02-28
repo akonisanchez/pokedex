@@ -10,6 +10,43 @@ app = Flask(__name__)
 # Initialtize database when app stars
 init_db()
 
+# Pokemon type colors 
+TYPE_COLORS = {
+    "Normal": "#A8A77A",
+    "Fire": "#EE8130",
+    "Water": "#6390F0",
+    "Electric": "#F7D02C",
+    "Grass": "#7AC74C",
+    "Ice": "#96D9D6",
+    "Fighting": "#C22E28",
+    "Poison": "#A33EA1",
+    "Ground": "#E2BF65",
+    "Flying": "#A98FF3",
+    "Psychic": "#F95587",
+    "Bug": "#A6B91A",
+    "Rock": "#B6A136",
+    "Ghost": "#735797",
+    "Dragon": "#6F35FC",
+    "Dark": "#705746",
+    "Steel": "#B7B7CE",
+    "Fairy": "#D685AD",
+}
+
+
+def _text_color_for_bg(hex_color: str) -> str:
+    """
+    Black/white text for readability based on background color brightness.
+    Keeps badges readable without manually tuning each type.
+    """
+    hex_color = hex_color.lstrip("#")
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+
+    # Perceived luminance 
+    luminance = 0.299 * r + 0.587 * g + 0.114 * b
+    return "#111111" if luminance > 165 else "#ffffff"
+
 # Pokedex Homepage route
 # This runs when someone visits the root URL and renders the main search page
 @app.get("/")
@@ -66,7 +103,13 @@ def show_pokemon():
         ],
     }
 
-    return render_template("pokemon.html", pokemon=pokemon)
+    # Build per-type style info for the template
+    type_styles = {}
+    for t in pokemon["types"]:
+        bg = TYPE_COLORS.get(t, "#6c757d")  # fallback gray
+        type_styles[t] = {"bg": bg, "fg": _text_color_for_bg(bg)}
+
+    return render_template("pokemon.html", pokemon=pokemon, type_styles=type_styles)
 
 @app.get("/favorites")
 def show_favorites():
