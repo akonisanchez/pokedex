@@ -1,33 +1,30 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Favorites</title>
-  </head>
+{% extends "base.html" %}
 
-  <body>
+{% block title %}Favorites{% endblock %}
 
-    <h1>Favorite Pokémon</h1>
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card pokedex-card p-4">
+        <h1 class="h4 mb-3">Favorite Pokémon</h1>
 
-    {% if favorites %}
-      <ul>
-        {% for fav in favorites %}
-          <li>
-            {{ fav.display }}
+        {% if favorites %}
+          <ul class="list-group">
+            {% for fav in favorites %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ fav.display }}</span>
 
-            <!-- POST form to remove this Pokemon -->
-            <form action="/favorites/remove" method="post" style="display:inline;">
-              <input type="hidden" name="name" value="{{ fav.raw }}">
-              <button type="submit">Remove</button>
-            </form>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No favorites saved yet.</p>
-    {% endif %}
-
-    <a href="/">Back to search</a>
-
-  </body>
-</html>
+                <form action="/favorites/remove" method="post" class="m-0">
+                  <input type="hidden" name="name" value="{{ fav.raw }}">
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0">No favorites saved yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

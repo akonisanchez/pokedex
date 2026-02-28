@@ -1,0 +1,24 @@
+/* Pokédex-inspo*/
+body {
+  background: #f6f7fb;
+}
+
+.pokedex-nav {
+  background: #d32f2f; /* Pokédex red */
+}
+
+.pokedex-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.sprite {
+  width: 160px;
+  height: 160px;
+  image-rendering: pixelated;
+}
+
+.badge-type {
+  font-size: 0.9rem;
+}

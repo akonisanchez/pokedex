@@ -1,58 +1,57 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Pokédex - Result</title>
-  </head>
+{% extends "base.html" %}
 
-  <body>
-    <!-- Page title -->
-    <h1>Pokédex Result</h1>
+{% block title %}Pokédex Result{% endblock %}
 
-    {% if error %}
-      <!-- Backend sets "error when pokemon can't be found -->
-      <p>{{ error }}</p>
-    {% else %}
-      <!-- "pokemon" is passed in from Flask (a dict of details) -->
-      <h2>{{ pokemon.name }}</h2>
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card pokedex-card p-4">
+        <h1 class="h4 mb-3">Pokédex Result</h1>
 
-      {% if pokemon.sprite %}
-        <img src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
-      {% endif %}
+        {% if error %}
+          <div class="alert alert-danger mb-0">{{ error }}</div>
+        {% else %}
+          <div class="d-flex flex-column flex-md-row gap-4 align-items-center">
+            {% if pokemon.sprite %}
+              <img class="sprite" src="{{ pokemon.sprite }}" alt="{{ pokemon.name }}">
+            {% endif %}
 
-      <p>Height: {{ pokemon.height}} </p>
-      <p>Weight: {{ pokemon.weight}} </p>
-      
-      <!-- Types -->
-       <h3>Type(s)</h3>
-       <ul>
-        {% for t in pokemon.types %}
-          <li>{{ t }}</li>
-        {% endfor %}
-       </ul>
+            <div class="flex-grow-1">
+              <h2 class="h3 mb-2">{{ pokemon.name }}</h2>
 
-       <!-- Base stats -->
-        <h3>Base Stats</h3>
-        <ul>
-          {% for stat in pokemon.stats %}
-            <li>{{ stat.name }}: {{ stat.value }}</li>
-          {% endfor %}
-        </ul>
+              <div class="mb-3">
+                {% for t in pokemon.types %}
+                  <span class="badge text-bg-primary badge-type me-1">{{ t }}</span>
+                {% endfor %}
+              </div>
 
-        <!-- Form to save Pokemon to favorites -->
-        <form action="/favorites/add" method="post">
+              <div class="row g-2">
+                <div class="col-sm-6">
+                  <div class="p-2 bg-light rounded">Height: <strong>{{ pokemon.height }}</strong></div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="p-2 bg-light rounded">Weight: <strong>{{ pokemon.weight }}</strong></div>
+                </div>
+              </div>
 
-          <!-- Hidden input sends Pokemon name to backend -->
-          <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+              <h3 class="h5 mt-4">Base Stats</h3>
+              <ul class="list-group">
+                {% for stat in pokemon.stats %}
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>{{ stat.name }}</span>
+                    <strong>{{ stat.value }}</strong>
+                  </li>
+                {% endfor %}
+              </ul>
 
-          <button type="submit">Save to Favorites</button>
-
-        </form>
-    {% endif %}
-
-    <p><a href"/favorites">View Favorites</a></p>
-    
-    <!-- Navigation link back to homepage -->
-    <p><a href="/">Search again</a></p>
-  </body>
-</html>
+              <form action="/favorites/add" method="post" class="mt-3">
+                <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+                <button type="submit" class="btn btn-warning">Save to Favorites</button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
