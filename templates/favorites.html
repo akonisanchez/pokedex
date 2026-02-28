@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Favorites</title>
+  </head>
+
+  <body>
+
+    <h1>Favorite Pokémon</h1>
+
+    {% if favorites %}
+      <ul>
+        {% for name in favorites %}
+          <li>{{ name }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No favorites saved yet.</p>
+    {% endif %}
+
+    <a href="/">Back to search</a>
+
+  </body>
+</html>

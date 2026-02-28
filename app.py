@@ -1,9 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for
+from db import init_db
 import requests
+import sqlite3
 
 # Create the Pokedex web application
 # This represents web server
 app = Flask(__name__)
+
+# Initialtize database when app stars
+init_db()
 
 # Pokedex Homepage route
 # This runs when someone visits the root URL and renders the main search page
@@ -62,6 +67,24 @@ def show_pokemon():
     }
 
     return render_template("pokemon.html", pokemon=pokemon)
+
+@app.get("/favorites")
+def show_favorites():
+    """
+    Display all saved favorite Pokemon.
+    """
+
+    conn = sqlite3.connect("pokedex.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT name FROM favorites ORDER BY name")
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    favorites = [row[0].title() for row in rows]
+
+    return render_template("favorites.html", favorites=favorites)
 
 # Start the server
 if __name__ == "__main__":
