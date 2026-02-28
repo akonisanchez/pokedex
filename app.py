@@ -108,8 +108,20 @@ def show_pokemon():
     for t in pokemon["types"]:
         bg = TYPE_COLORS.get(t, "#6c757d")  # fallback gray
         type_styles[t] = {"bg": bg, "fg": _text_color_for_bg(bg)}
+    
+    # Check whether this Pokemon is already saved as a favorite
+    conn = sqlite3.connect("pokedex.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM favorites WHERE name = ? LIMIT 1", (name,))
+    is_favorite = cursor.fetchone() is not None
+    conn.close()
 
-    return render_template("pokemon.html", pokemon=pokemon, type_styles=type_styles)
+    return render_template(
+        "pokemon.html", 
+        pokemon=pokemon, 
+        type_styles=type_styles,
+        is_favorite=is_favorite,
+        )
 
 @app.get("/favorites")
 def show_favorites():

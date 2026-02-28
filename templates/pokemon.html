@@ -49,10 +49,20 @@
                 {% endfor %}
               </ul>
 
-              <form action="/favorites/add" method="post" class="mt-3">
-                <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
-                <button type="submit" class="btn btn-warning">Save to Favorites</button>
-              </form>
+        {% if is_favorite %}
+          <!-- If already favorited, offer remove -->
+          <form action="/favorites/remove" method="post" class="mt-3">
+            <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+            <button type="submit" class="btn btn-outline-danger">Remove from Favorites</button>
+          </form>
+        {% else %}
+          <!-- If not favorited, offer save -->
+          <form action="/favorites/add" method="post" class="mt-3">
+            <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+            <button type="submit" class="btn btn-warning">Save to Favorites</button>
+          </form>
+        {% endif %}
+        
             </div>
           </div>
         {% endif %}
