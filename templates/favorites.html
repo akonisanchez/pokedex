@@ -11,8 +11,16 @@
 
     {% if favorites %}
       <ul>
-        {% for name in favorites %}
-          <li>{{ name }}</li>
+        {% for fav in favorites %}
+          <li>
+            {{ fav.display }}
+
+            <!-- POST form to remove this Pokemon -->
+            <form action="/favorites/remove" method="post" style="display:inline;">
+              <input type="hidden" name="name" value="{{ fav.raw }}">
+              <button type="submit">Remove</button>
+            </form>
+          </li>
         {% endfor %}
       </ul>
     {% else %}

@@ -82,8 +82,7 @@ def show_favorites():
 
     conn.close()
 
-    favorites = [row[0].title() for row in rows]
-
+    favorites = [{"raw": row[0], "display": row[0].title()} for row in rows]
     return render_template("favorites.html", favorites=favorites)
 
 @app.post("/favorites/add")
@@ -116,6 +115,30 @@ def add_favorite():
         conn.close()
 
     # Redirect user to favorites page after saving
+    return redirect(url_for("show_favorites"))
+
+@app.post("/favorites/remove")
+def remove_favorite():
+    """
+    Remove a Pokemon from favorites.
+
+    Receives a POST request from the favorites page and deletes
+    the Pokemon name from the favorites table.
+    """
+    pokemon_name = request.form.get("name", "").strip().lower()
+
+    if not pokemon_name:
+        return redirect(url_for("show_favorites"))
+
+    conn = sqlite3.connect("pokedex.db")
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM favorites WHERE name = ?", (pokemon_name,))
+        conn.commit()
+    finally:
+        conn.close()
+
     return redirect(url_for("show_favorites"))
 
 # Start the server
