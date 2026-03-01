@@ -39,6 +39,18 @@
                 </div>
               </div>
 
+            {% if evolution_chain %}
+              <h3 class="h5 mt-4">Evolution Chain</h3>
+              <p class="mb-0">
+                {% for evo_name in evolution_chain %}
+                  <a href="/pokemon?name={{ evo_name }}" class="link-underline link-underline-opacity-0">
+                    {{ evo_name.title() }}
+                  </a>
+                  {% if not loop.last %} → {% endif %}
+                {% endfor %}
+               </p>
+            {% endif %}
+
               <h3 class="h5 mt-4">Base Stats</h3>
               <ul class="list-group">
                 {% for stat in pokemon.stats %}

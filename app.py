@@ -10,6 +10,62 @@ app = Flask(__name__)
 # Initialtize database when app stars
 init_db()
 
+def _extract_evolution_names(chain_node: dict) -> list[str]:
+    """
+    Flatten an evolution chain structure into a simple list of Pokemon names.
+
+    PokéAPI structure looks like:
+    chain = {
+      "species": {"name": "pichu", ...},
+      "evolves_to": [
+         {"species": {"name": "pikachu"}, "evolves_to": [...]}
+      ]
+    }
+    """
+    names = []
+
+    def walk(node: dict):
+        species = node.get("species", {})
+        name = species.get("name")
+        if name:
+            names.append(name)
+
+        for child in node.get("evolves_to", []):
+            walk(child)
+
+    walk(chain_node)
+    return names
+
+
+def get_evolution_chain(pokemon_name: str) -> list[str] | None:
+    """
+    Given a Pokemon name, fetch and return its evolution chain as a list of names.
+    Returns None if any step fails.
+    """
+    # 1) Species endpoint (contains evolution chain URL)
+    species_url = f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_name}"
+    species_resp = requests.get(species_url, timeout=10)
+    if species_resp.status_code != 200:
+        return None
+
+    species_data = species_resp.json()
+    evo_chain_info = species_data.get("evolution_chain", {})
+    evo_chain_url = evo_chain_info.get("url")
+    if not evo_chain_url:
+        return None
+
+    # 2) Evolution chain endpoint
+    evo_resp = requests.get(evo_chain_url, timeout=10)
+    if evo_resp.status_code != 200:
+        return None
+
+    evo_data = evo_resp.json()
+    chain = evo_data.get("chain")
+    if not chain:
+        return None
+
+    return _extract_evolution_names(chain)
+
 # Pokemon type colors 
 TYPE_COLORS = {
     "Normal": "#A8A77A",
@@ -103,6 +159,8 @@ def show_pokemon():
         ],
     }
 
+    evolution_chain = get_evolution_chain(name)
+
     # Build per-type style info for the template
     type_styles = {}
     for t in pokemon["types"]:
@@ -121,6 +179,7 @@ def show_pokemon():
         pokemon=pokemon, 
         type_styles=type_styles,
         is_favorite=is_favorite,
+        evolution_chain=evolution_chain,
         )
 
 @app.get("/favorites")
