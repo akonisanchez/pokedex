@@ -16,10 +16,17 @@
             id="name"
             name="name"
             placeholder="e.g., pikachu"
+            list="pokemon-options"
             required
           >
           <button type="submit" class="btn btn-danger">Search</button>
         </form>
+
+        <datalist id="pokemon-options">
+          {% for n in pokemon_names %}
+            <option value="{{ n }}"></option>
+          {% endfor %}
+        </datalist>
 
         <p class="mt-3 mb-0 small text-muted">
           Tip: Try <strong>bulbasaur</strong>, <strong>charmander</strong>, or <strong>squirtle</strong>.

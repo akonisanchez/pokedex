@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for
 from db import init_db
 import requests
 import sqlite3
+import json
+from pathlib import Path
 
 # Create the Pokedex web application
 # This represents web server
@@ -9,6 +11,13 @@ app = Flask(__name__)
 
 # Initialtize database when app stars
 init_db()
+
+# Load Pokemon names once for fast autocomplete on the homepage
+NAMES_PATH = Path("data/pokemon_names.json")
+POKEMON_NAMES = []
+
+if NAMES_PATH.exists():
+    POKEMON_NAMES = json.loads(NAMES_PATH.read_text())
 
 def _extract_evolution_names(chain_node: dict) -> list[str]:
     """
@@ -107,7 +116,7 @@ def _text_color_for_bg(hex_color: str) -> str:
 # This runs when someone visits the root URL and renders the main search page
 @app.get("/")
 def pokedex_home():
-    return render_template("index.html")
+    return render_template("index.html", pokemon_names=POKEMON_NAMES)
 
 # Pokemon search results route
 # This runs when user submits the search form
