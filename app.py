@@ -19,6 +19,62 @@ POKEMON_NAMES = []
 if NAMES_PATH.exists():
     POKEMON_NAMES = json.loads(NAMES_PATH.read_text())
 
+FRLG_VERSIONS = {"firered", "leafgreen"}
+
+def _pretty_location_area(name: str) -> str:
+    # Example: "viridian-forest-area" -> "Viridian Forest Area"
+    return name.replace("-", " ").title()
+
+def get_frlg_encounters(pokemon_name: str) -> dict[str, list[str]] | None:
+    """
+    Return FireRed/LeafGreen encounter locations for a Pokemon.
+
+    Output example:
+      {
+        "firered": ["Route 2 Area", "Viridian Forest Area"],
+        "leafgreen": ["Route 2 Area"]
+      }
+
+    Returns None if no FR/LG encounter locations are found.
+    """
+    # Use the dedicated encounters endpoint 
+    pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name}"
+    poke_resp = requests.get(pokemon_url, timeout=10)
+    if poke_resp.status_code != 200:
+        return None
+
+    poke_data = poke_resp.json()
+
+    # URL that returns a list of location areas + version details
+    encounters_url = poke_data.get("location_area_encounters")
+    if not encounters_url:
+        return None
+
+    enc_resp = requests.get(encounters_url, timeout=10)
+    if enc_resp.status_code != 200:
+        return None
+
+    encounter_rows = enc_resp.json()
+
+    results: dict[str, set[str]] = {"firered": set(), "leafgreen": set()}
+
+    for row in encounter_rows:
+        loc_area = (row.get("location_area") or {}).get("name")
+        if not loc_area:
+            continue
+
+        for vd in row.get("version_details", []):
+            version_name = ((vd.get("version") or {}).get("name") or "").lower()
+            if version_name in FRLG_VERSIONS:
+                results[version_name].add(_pretty_location_area(loc_area))
+
+    # Convert sets to sorted lists
+    results_list = {
+        k: sorted(list(v)) for k, v in results.items() if v
+    }
+
+    return results_list if results_list else None
+
 def _extract_evolution_stages(chain_node: dict) -> list[list[str]]:
     """
     Convert PokéAPI evolution chain structure into stage-based rows.
@@ -181,7 +237,8 @@ def show_pokemon():
             for s in data["stats"]
         ],
     }
-
+    
+    frlg_encounters=get_frlg_encounters(name)
     evolution_stages = get_evolution_chain(name)
 
     # Build per-type style info for the template
@@ -203,6 +260,7 @@ def show_pokemon():
         type_styles=type_styles,
         is_favorite=is_favorite,
         evolution_stages=evolution_stages,
+        frlg_encounters=frlg_encounters,
         )
 
 @app.get("/favorites")

@@ -65,6 +65,44 @@
                 {% endfor %}
               </ul>
 
+
+            {% if frlg_encounters %}
+              <h3 class="h5 mt-4">Catch Locations (FireRed / LeafGreen)</h3>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h4 class="h6 text-muted">FireRed</h4>
+                  {% if frlg_encounters.firered %}
+                    <ul class="mb-0">
+                      {% for loc in frlg_encounters.firered %}
+                        <li>{{ loc }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="text-muted mb-0">No wild encounter data found.</p>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                  <h4 class="h6 text-muted">LeafGreen</h4>
+                  {% if frlg_encounters.leafgreen %}
+                    <ul class="mb-0">
+                     {% for loc in frlg_encounters.leafgreen %}
+                       <li>{{ loc }}</li>
+                     {% endfor %}
+                   </ul>
+                 {% else %}
+                   <p class="text-muted mb-0">No wild encounter data found.</p>
+                 {% endif %}
+               </div>
+             </div>
+           {% else %}
+             <h3 class="h5 mt-4">Catch Locations (FireRed / LeafGreen)</h3>
+             <p class="text-muted mb-0">
+               No wild encounter data found in FireRed/LeafGreen (may be starter/trade/event).
+             </p>
+           {% endif %}
+
         {% if is_favorite %}
           <!-- If already favorited, offer remove -->
           <form action="/favorites/remove" method="post" class="mt-3">
