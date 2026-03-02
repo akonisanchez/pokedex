@@ -19,31 +19,46 @@ POKEMON_NAMES = []
 if NAMES_PATH.exists():
     POKEMON_NAMES = json.loads(NAMES_PATH.read_text())
 
-def _extract_evolution_names(chain_node: dict) -> list[str]:
+def _extract_evolution_stages(chain_node: dict) -> list[list[str]]:
     """
-    Flatten an evolution chain structure into a simple list of Pokemon names.
+    Convert PokéAPI evolution chain structure into stage-based rows.
 
-    PokéAPI structure looks like:
-    chain = {
-      "species": {"name": "pichu", ...},
-      "evolves_to": [
-         {"species": {"name": "pikachu"}, "evolves_to": [...]}
+    Output example (branching):
+      [
+        ["eevee"],
+        ["vaporeon", "jolteon", "flareon", ...]
       ]
-    }
+
+    Output example (linear):
+      [
+        ["bulbasaur"],
+        ["ivysaur"],
+        ["venusaur"]
+      ]
     """
-    names = []
+    stages: list[list[str]] = []
+    current_level = [chain_node]
 
-    def walk(node: dict):
-        species = node.get("species", {})
-        name = species.get("name")
-        if name:
-            names.append(name)
+    while current_level:
+        stage_names: list[str] = []
+        next_level: list[dict] = []
 
-        for child in node.get("evolves_to", []):
-            walk(child)
+        for node in current_level:
+            species = node.get("species", {})
+            name = species.get("name")
+            if name:
+                stage_names.append(name)
 
-    walk(chain_node)
-    return names
+            next_level.extend(node.get("evolves_to", []))
+
+        # Deduplicate and sort for stable display
+        stage_names = sorted(set(stage_names))
+        if stage_names:
+            stages.append(stage_names)
+
+        current_level = next_level
+
+    return stages
 
 
 def get_evolution_chain(pokemon_name: str) -> list[str] | None:
@@ -58,8 +73,7 @@ def get_evolution_chain(pokemon_name: str) -> list[str] | None:
         return None
 
     species_data = species_resp.json()
-    evo_chain_info = species_data.get("evolution_chain", {})
-    evo_chain_url = evo_chain_info.get("url")
+    evo_chain_url = (species_data.get("evolution_chain") or {}).get("url")
     if not evo_chain_url:
         return None
 
@@ -73,7 +87,7 @@ def get_evolution_chain(pokemon_name: str) -> list[str] | None:
     if not chain:
         return None
 
-    return _extract_evolution_names(chain)
+    return _extract_evolution_stages(chain)
 
 # Pokemon type colors 
 TYPE_COLORS = {
@@ -168,7 +182,7 @@ def show_pokemon():
         ],
     }
 
-    evolution_chain = get_evolution_chain(name)
+    evolution_stages = get_evolution_chain(name)
 
     # Build per-type style info for the template
     type_styles = {}
@@ -188,7 +202,7 @@ def show_pokemon():
         pokemon=pokemon, 
         type_styles=type_styles,
         is_favorite=is_favorite,
-        evolution_chain=evolution_chain,
+        evolution_stages=evolution_stages,
         )
 
 @app.get("/favorites")
