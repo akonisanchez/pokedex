@@ -11,14 +11,22 @@
         {% if favorites %}
           <ul class="list-group">
             {% for fav in favorites %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ fav.display }}</span>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center gap-2">
+                <a href="/pokemon?name={{ fav.raw }}" class="fw-semibold text-decoration-none">
+                  {{ fav.display }}
+                </a>
 
-                <form action="/favorites/remove" method="post" class="m-0">
-                  <input type="hidden" name="name" value="{{ fav.raw }}">
-                  <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
-                </form>
-              </li>
+                <a href="/pokemon?name={{ fav.raw }}" class="btn btn-outline-primary btn-sm">
+                  View
+                </a>
+              </div>
+
+              <form action="/favorites/remove" method="post" class="m-0">
+                <input type="hidden" name="name" value="{{ fav.raw }}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+              </form>
+            </li>
             {% endfor %}
           </ul>
         {% else %}
