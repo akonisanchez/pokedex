@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from db import init_db
+import random
 import requests
 import sqlite3
 import json
@@ -187,6 +188,20 @@ def _text_color_for_bg(hex_color: str) -> str:
 @app.get("/")
 def pokedex_home():
     return render_template("index.html", pokemon_names=POKEMON_NAMES)
+
+# Returns a random Pokemon
+@app.get("/random")
+def random_pokemon():
+    """
+    Redirect to a random Pokemon result page.
+
+    Uses the locally cached Pokemon name list 
+    """
+    if not POKEMON_NAMES:
+        return redirect(url_for("pokedex_home"))
+
+    name = random.choice(POKEMON_NAMES)
+    return redirect(url_for("show_pokemon", name=name))
 
 # Pokemon search results route
 # This runs when user submits the search form
