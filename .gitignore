@@ -10,3 +10,6 @@ venv/
 
 # Database files
 *.db
+
+# Environment variables
+.env

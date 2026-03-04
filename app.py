@@ -1,14 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for
-from db import init_db
+from db import init_db, get_conn
 import random
 import requests
 import sqlite3
+import os
 import json
 from pathlib import Path
 
 # Create the Pokedex web application
 # This represents web server
 app = Flask(__name__)
+
+# Deployment-safe session signing key:
+# - In production, set SECRET_KEY as an environment variable.
+# - Locally, we fall back to a dev-only value.
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret")
 
 # Initialtize database when app stars
 init_db()
