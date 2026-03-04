@@ -13,6 +13,27 @@
         {% endif %}
         <p class="text-muted mb-4">Search any Pokémon by name.</p>
 
+        <div class="dex-section mt-4">
+  <div class="dex-section-header">
+    <h2 class="dex-section-title">Kanto Dex</h2>
+    <p class="dex-section-sub">Tap a sprite to scan</p>
+  </div>
+
+  <div class="dex-scroller" role="list" aria-label="Kanto Pokémon">
+    {% for p in kanto %}
+      <a class="dex-sprite-tile" href="/pokemon?name={{ p.name }}" title="{{ p.name.title() }}">
+        <img
+          class="dex-sprite"
+          src="{{ url_for('static', filename='sprites/gen1-red-blue/' ~ p.id ~ '.png') }}"
+          alt="{{ p.name.title() }}"
+          loading="lazy"
+        >
+        <div class="dex-sprite-label">{{ p.id }}. {{ p.name.title() }}</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
         <form action="/pokemon" method="get" class="d-flex gap-2">
           <input
             type="text"

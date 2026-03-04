@@ -182,3 +182,79 @@ body {
 .pokedex-card {
   border-radius: 18px;
 }
+
+/* ===== Homepage Kanto scroller ===== */
+
+.dex-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.dex-section-title {
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+.dex-section-sub {
+  margin: 0;
+  color: rgba(0,0,0,0.55);
+  font-size: 0.95rem;
+}
+
+/* horizontal scroll row */
+.dex-scroller {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,0,0,0.08);
+  scroll-snap-type: x mandatory;
+}
+
+.dex-scroller::-webkit-scrollbar {
+  height: 10px;
+}
+.dex-scroller::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.18);
+  border-radius: 999px;
+}
+
+.dex-sprite-tile {
+  flex: 0 0 auto;
+  width: 120px;
+  text-decoration: none;
+  color: #111;
+  border-radius: 14px;
+  padding: 10px 8px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.05);
+  scroll-snap-align: start;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.dex-sprite-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 22px rgba(0,0,0,0.08);
+}
+
+.dex-sprite {
+  width: 72px;
+  height: 72px;
+  display: block;
+  margin: 0 auto 6px;
+  image-rendering: pixelated;
+}
+
+.dex-sprite-label {
+  font-size: 0.85rem;
+  text-align: center;
+  color: rgba(0,0,0,0.7);
+  line-height: 1.2;
+}

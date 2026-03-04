@@ -23,11 +23,33 @@ init_db()
 # Load Pokemon names once for fast autocomplete on the homepage
 NAMES_PATH = Path("data/pokemon_names.json")
 POKEMON_NAMES = []
+KANTO_POKEMON = []
 
 if NAMES_PATH.exists():
     POKEMON_NAMES = json.loads(NAMES_PATH.read_text())
 
 FRLG_VERSIONS = {"firered", "leafgreen"}
+
+def load_kanto_pokemon() -> list[dict]:
+    """
+    Load the original 151 Pokémon in National Dex order.
+    Cached in memory so don't need to refetch on every request.
+    """
+    url = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0"
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    data = resp.json()
+
+    results = data.get("results", [])
+    kanto = []
+    for i, item in enumerate(results, start=1):
+        kanto.append({"id": i, "name": item["name"]})
+    return kanto
+
+try:
+    KANTO_POKEMON = load_kanto_pokemon()
+except Exception:
+    KANTO_POKEMON = []
 
 def _pretty_location_area(name: str) -> str:
     # Example: "viridian-forest-area" -> "Viridian Forest Area"
@@ -194,7 +216,13 @@ def _text_color_for_bg(hex_color: str) -> str:
 # This runs when someone visits the root URL and renders the main search page
 @app.get("/")
 def pokedex_home():
-    return render_template("index.html", pokemon_names=POKEMON_NAMES)
+    # Kanto dex (first 151) for homepage scroller
+    kanto = KANTO_POKEMON
+    return render_template(
+        "index.html", 
+        pokemon_names=POKEMON_NAMES,
+        kanto=kanto
+    )
 
 # Returns a random Pokemon
 @app.get("/random")
