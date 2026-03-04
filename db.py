@@ -15,9 +15,10 @@ def get_conn():
 
 def init_db():
     """
-    Initialize the database and create the favorites table if it doesn't exist.
+    Initialize the database.
+    Creates users table and a user-scoped favorites table.
+    Safe to run multiple times.
     """
-
     conn = get_conn()
     cursor = conn.cursor()
 
@@ -25,8 +26,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-                   password_hash TEXT NOT NULL
-        )
+            password_hash TEXT NOT NULL
+        );
     """)
 
     cursor.execute("""
@@ -35,9 +36,12 @@ def init_db():
             user_id INTEGER NOT NULL,
             pokemon_name TEXT NOT NULL,
             UNIQUE(user_id, pokemon_name),
-                   FOREIGN KEY(user_id) REFERENCES users(id
-        )
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
     """)
+
+    conn.commit()
+    conn.close()
 
 def reset_favorites_table():
     """

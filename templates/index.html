@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Pokédex{% endblock %}
+{% block title %}Pokédex 360{% endblock %}
 
 {% block content %}
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
       <div class="card pokedex-card p-4">
-        <h1 class="h3 mb-2">Welcome, Trainer</h1>
+        {% if session.get("username") %}
+          <h1 class="h3" mb-2">Welcome, {{ session.get("username") }}!</h1>
+        {% else %}
+          <h1 class="h3 mb-2">Welcome, Trainer</h1>
+        {% endif %}
         <p class="text-muted mb-4">Search any Pokémon by name.</p>
 
         <form action="/pokemon" method="get" class="d-flex gap-2">

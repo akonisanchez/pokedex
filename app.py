@@ -302,13 +302,14 @@ def show_favorites():
     if "user_id" not in session:
         return redirect(url_for("login_form"))
 
-    conn = sqlite3.connect("pokedex.db")
+    conn = get_conn()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_Name",
-                   session["user_id"],)
+    cursor.execute(
+        "SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_Name",
+        (session["user_id"],)
+    )
     rows = cursor.fetchall()
-
     conn.close()
 
     favorites = [{"raw": row[0], "display": row[0].title()} for row in rows]
@@ -333,7 +334,7 @@ def add_favorite():
     if not pokemon_name:
         return redirect(url_for("pokedex_home"))
 
-    conn = sqlite3.connect("pokedex.db")
+    conn = get_conn()
     cursor = conn.cursor()
 
     try:
@@ -366,7 +367,7 @@ def remove_favorite():
     if not pokemon_name:
         return redirect(url_for("show_favorites"))
 
-    conn = sqlite3.connect("pokedex.db")
+    conn = get_conn()
     cursor = conn.cursor()
 
     try:
