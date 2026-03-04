@@ -103,19 +103,23 @@
              </p>
            {% endif %}
 
-        {% if is_favorite %}
-          <!-- If already favorited, offer remove -->
-          <form action="/favorites/remove" method="post" class="mt-3">
-            <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
-            <button type="submit" class="btn btn-outline-danger">Remove from Favorites</button>
-          </form>
-        {% else %}
-          <!-- If not favorited, offer save -->
-          <form action="/favorites/add" method="post" class="mt-3">
-            <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
-            <button type="submit" class="btn btn-warning">Save to Favorites</button>
-          </form>
-        {% endif %}
+        {% if session.get("user_id") %}
+          {% if is_favorite %}
+            <form action="/favorites/remove" method="post" class="mt-3">
+              <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+              <button type="submit" class="btn btn-outline-danger">Remove from Favorites</button>
+            </form>
+          {% else %}
+            <form action="/favorites/add" method="post" class="mt-3">
+              <input type="hidden" name="name" value="{{ pokemon.name.lower() }}">
+              <button type="submit" class="btn btn-warning">Save to Favorites</button>
+            </form>
+          {% endif %}
+       {% else %}
+         <p class="text-muted mt-3 mb-0">
+           <a href="/login">Log in</a> to save favorites.
+         </p>
+       {% endif %}
         
             </div>
           </div>

@@ -270,11 +270,19 @@ def show_pokemon():
         type_styles[t] = {"bg": bg, "fg": _text_color_for_bg(bg)}
     
     # Check whether this Pokemon is already saved as a favorite
-    conn = sqlite3.connect("pokedex.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM favorites WHERE name = ? LIMIT 1", (name,))
-    is_favorite = cursor.fetchone() is not None
-    conn.close()
+    # Default: not favorited
+    is_favorite = False
+
+    # Only check favorites if the user is logged in
+    if "user_id" in session:
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT 1 FROM favorites WHERE user_id = ? AND pokemon_name = ? LIMIT 1",
+            (session["user_id"], name),
+        )
+        is_favorite = cursor.fetchone() is not None
+        conn.close()
 
     return render_template(
         "pokemon.html", 
@@ -291,10 +299,14 @@ def show_favorites():
     Display all saved favorite Pokemon.
     """
 
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+
     conn = sqlite3.connect("pokedex.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name FROM favorites ORDER BY name")
+    cursor.execute("SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_Name",
+                   session["user_id"],)
     rows = cursor.fetchall()
 
     conn.close()
@@ -311,6 +323,9 @@ def add_favorite():
     and inserts the Pokemon name into the favorites table.
     """
 
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+
     # Get Pokemon name from submitted form data
     pokemon_name = request.form.get("name", "").strip().lower()
 
@@ -324,8 +339,8 @@ def add_favorite():
     try:
         # INSERT OR IGNORE prevents duplicate entries
         cursor.execute(
-            "INSERT OR IGNORE INTO favorites (name) VALUES (?)",
-            (pokemon_name,)
+            "INSERT OR IGNORE INTO favorites (user_id, pokemon_name) VALUES (?, ?)",
+            (session["user_id"], pokemon_name),
         )
         conn.commit()
     finally:
@@ -342,6 +357,10 @@ def remove_favorite():
     Receives a POST request from the favorites page and deletes
     the Pokemon name from the favorites table.
     """
+
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+    
     pokemon_name = request.form.get("name", "").strip().lower()
 
     if not pokemon_name:
@@ -351,7 +370,9 @@ def remove_favorite():
     cursor = conn.cursor()
 
     try:
-        cursor.execute("DELETE FROM favorites WHERE name = ?", (pokemon_name,))
+        cursor.execute("DELETE FROM favorites WHERE user_id = ? AND pokemon_name = ?",
+                      (session["user_id"], pokemon_name),
+        )
         conn.commit()
     finally:
         conn.close()
