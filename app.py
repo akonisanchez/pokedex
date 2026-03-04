@@ -1,14 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for
-from db import init_db
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
+from db import init_db, get_conn
 import random
 import requests
 import sqlite3
+import os
 import json
 from pathlib import Path
 
 # Create the Pokedex web application
 # This represents web server
 app = Flask(__name__)
+
+# Deployment-safe session signing key:
+# - In production, set SECRET_KEY as an environment variable.
+# - Locally, we fall back to a dev-only value.
+app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret")
 
 # Initialtize database when app stars
 init_db()
@@ -263,11 +270,19 @@ def show_pokemon():
         type_styles[t] = {"bg": bg, "fg": _text_color_for_bg(bg)}
     
     # Check whether this Pokemon is already saved as a favorite
-    conn = sqlite3.connect("pokedex.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM favorites WHERE name = ? LIMIT 1", (name,))
-    is_favorite = cursor.fetchone() is not None
-    conn.close()
+    # Default: not favorited
+    is_favorite = False
+
+    # Only check favorites if the user is logged in
+    if "user_id" in session:
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT 1 FROM favorites WHERE user_id = ? AND pokemon_name = ? LIMIT 1",
+            (session["user_id"], name),
+        )
+        is_favorite = cursor.fetchone() is not None
+        conn.close()
 
     return render_template(
         "pokemon.html", 
@@ -284,12 +299,17 @@ def show_favorites():
     Display all saved favorite Pokemon.
     """
 
-    conn = sqlite3.connect("pokedex.db")
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+
+    conn = get_conn()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name FROM favorites ORDER BY name")
+    cursor.execute(
+        "SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_Name",
+        (session["user_id"],)
+    )
     rows = cursor.fetchall()
-
     conn.close()
 
     favorites = [{"raw": row[0], "display": row[0].title()} for row in rows]
@@ -304,6 +324,9 @@ def add_favorite():
     and inserts the Pokemon name into the favorites table.
     """
 
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+
     # Get Pokemon name from submitted form data
     pokemon_name = request.form.get("name", "").strip().lower()
 
@@ -311,14 +334,14 @@ def add_favorite():
     if not pokemon_name:
         return redirect(url_for("pokedex_home"))
 
-    conn = sqlite3.connect("pokedex.db")
+    conn = get_conn()
     cursor = conn.cursor()
 
     try:
         # INSERT OR IGNORE prevents duplicate entries
         cursor.execute(
-            "INSERT OR IGNORE INTO favorites (name) VALUES (?)",
-            (pokemon_name,)
+            "INSERT OR IGNORE INTO favorites (user_id, pokemon_name) VALUES (?, ?)",
+            (session["user_id"], pokemon_name),
         )
         conn.commit()
     finally:
@@ -335,21 +358,93 @@ def remove_favorite():
     Receives a POST request from the favorites page and deletes
     the Pokemon name from the favorites table.
     """
+
+    if "user_id" not in session:
+        return redirect(url_for("login_form"))
+    
     pokemon_name = request.form.get("name", "").strip().lower()
 
     if not pokemon_name:
         return redirect(url_for("show_favorites"))
 
-    conn = sqlite3.connect("pokedex.db")
+    conn = get_conn()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("DELETE FROM favorites WHERE name = ?", (pokemon_name,))
+        cursor.execute("DELETE FROM favorites WHERE user_id = ? AND pokemon_name = ?",
+                      (session["user_id"], pokemon_name),
+        )
         conn.commit()
     finally:
         conn.close()
 
     return redirect(url_for("show_favorites"))
+
+# Auth routes
+@app.get("/register")
+def register_form():
+    return render_template("register.html")
+
+
+@app.post("/register")
+def register_user():
+    username = request.form.get("username", "").strip().lower()
+    password = request.form.get("password", "")
+
+    if not username or not password:
+        return render_template("register.html", error="Username and password required.")
+
+    password_hash = generate_password_hash(password)
+
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            (username, password_hash),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return render_template("register.html", error="Username already taken.")
+
+    conn.close()
+    return redirect(url_for("login_form"))
+
+
+@app.get("/login")
+def login_form():
+    return render_template("login.html")
+
+
+@app.post("/login")
+def login_user():
+    username = request.form.get("username", "").strip().lower()
+    password = request.form.get("password", "")
+
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, password_hash FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return render_template("login.html", error="Invalid username or password.")
+
+    user_id, password_hash = row
+    if not check_password_hash(password_hash, password):
+        return render_template("login.html", error="Invalid username or password.")
+
+    session["user_id"] = user_id
+    session["username"] = username
+    return redirect(url_for("pokedex_home"))
+
+
+@app.post("/logout")
+def logout_user():
+    session.clear()
+    return redirect(url_for("pokedex_home"))
 
 # Start the server
 if __name__ == "__main__":
