@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
 from db import init_db, get_conn
 import random
 import requests
@@ -356,6 +357,72 @@ def remove_favorite():
         conn.close()
 
     return redirect(url_for("show_favorites"))
+
+# Auth routes
+@app.get("/register")
+def register_form():
+    return render_template("register.html")
+
+
+@app.post("/register")
+def register_user():
+    username = request.form.get("username", "").strip().lower()
+    password = request.form.get("password", "")
+
+    if not username or not password:
+        return render_template("register.html", error="Username and password required.")
+
+    password_hash = generate_password_hash(password)
+
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            (username, password_hash),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return render_template("register.html", error="Username already taken.")
+
+    conn.close()
+    return redirect(url_for("login_form"))
+
+
+@app.get("/login")
+def login_form():
+    return render_template("login.html")
+
+
+@app.post("/login")
+def login_user():
+    username = request.form.get("username", "").strip().lower()
+    password = request.form.get("password", "")
+
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, password_hash FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if not row:
+        return render_template("login.html", error="Invalid username or password.")
+
+    user_id, password_hash = row
+    if not check_password_hash(password_hash, password):
+        return render_template("login.html", error="Invalid username or password.")
+
+    session["user_id"] = user_id
+    session["username"] = username
+    return redirect(url_for("pokedex_home"))
+
+
+@app.post("/logout")
+def logout_user():
+    session.clear()
+    return redirect(url_for("pokedex_home"))
 
 # Start the server
 if __name__ == "__main__":
