@@ -5,6 +5,8 @@ import random
 import requests
 import sqlite3
 import os
+import time 
+from typing import Any
 import json
 from pathlib import Path
 
@@ -29,6 +31,25 @@ if NAMES_PATH.exists():
     POKEMON_NAMES = json.loads(NAMES_PATH.read_text())
 
 FRLG_VERSIONS = {"firered", "leafgreen"}
+
+# In-memory cache to reduce repeated PokéAPI calls.
+# Key -> (expires_at, value)
+CACHE: dict[str, tuple[float, Any]] = {}
+CACHE_TTL_SECONDS = 60 * 10  # 10 minutes
+
+def cache_get(key: str):
+    item = CACHE.get(key)
+    if not item:
+        return None
+    expires_at, value = item
+    if time.time() > expires_at:
+        CACHE.pop(key, None)
+        return None
+    return value
+
+
+def cache_set(key: str, value, ttl: int = CACHE_TTL_SECONDS):
+    CACHE[key] = (time.time() + ttl, value)
 
 def load_kanto_pokemon() -> list[dict]:
     """
@@ -55,37 +76,25 @@ def _pretty_location_area(name: str) -> str:
     # Example: "viridian-forest-area" -> "Viridian Forest Area"
     return name.replace("-", " ").title()
 
-def get_frlg_encounters(pokemon_name: str) -> dict[str, list[str]] | None:
+def get_frlg_encounters_from_url(encounters_url: str | None) -> dict[str, list[str]] | None:
     """
-    Return FireRed/LeafGreen encounter locations for a Pokemon.
-
-    Output example:
-      {
-        "firered": ["Route 2 Area", "Viridian Forest Area"],
-        "leafgreen": ["Route 2 Area"]
-      }
-
-    Returns None if no FR/LG encounter locations are found.
+    Given a location_area_encounters URL, return FireRed/LeafGreen encounter locations.
+    Returns None if no FR/LG data found or url missing.
     """
-    # Use the dedicated encounters endpoint 
-    pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_name}"
-    poke_resp = requests.get(pokemon_url, timeout=10)
-    if poke_resp.status_code != 200:
-        return None
-
-    poke_data = poke_resp.json()
-
-    # URL that returns a list of location areas + version details
-    encounters_url = poke_data.get("location_area_encounters")
     if not encounters_url:
         return None
 
+    cache_key = f"frlg:{encounters_url}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return cached
+
     enc_resp = requests.get(encounters_url, timeout=10)
     if enc_resp.status_code != 200:
+        cache_set(cache_key, None)
         return None
 
     encounter_rows = enc_resp.json()
-
     results: dict[str, set[str]] = {"firered": set(), "leafgreen": set()}
 
     for row in encounter_rows:
@@ -98,12 +107,10 @@ def get_frlg_encounters(pokemon_name: str) -> dict[str, list[str]] | None:
             if version_name in FRLG_VERSIONS:
                 results[version_name].add(_pretty_location_area(loc_area))
 
-    # Convert sets to sorted lists
-    results_list = {
-        k: sorted(list(v)) for k, v in results.items() if v
-    }
-
-    return results_list if results_list else None
+    results_list = {k: sorted(list(v)) for k, v in results.items() if v}
+    final = results_list if results_list else None
+    cache_set(cache_key, final)
+    return final
 
 def _extract_evolution_stages(chain_node: dict) -> list[list[str]]:
     """
@@ -152,6 +159,12 @@ def get_evolution_chain(pokemon_name: str) -> list[str] | None:
     Given a Pokemon name, fetch and return its evolution chain as a list of names.
     Returns None if any step fails.
     """
+
+    cache_key = f"evo:{pokemon_name}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return cached
+
     # 1) Species endpoint (contains evolution chain URL)
     species_url = f"https://pokeapi.co/api/v2/pokemon-species/{pokemon_name}"
     species_resp = requests.get(species_url, timeout=10)
@@ -171,9 +184,12 @@ def get_evolution_chain(pokemon_name: str) -> list[str] | None:
     evo_data = evo_resp.json()
     chain = evo_data.get("chain")
     if not chain:
+        cache_set(cache_key, None)
         return None
-
-    return _extract_evolution_stages(chain)
+    
+    stages = _extract_evolution_stages(chain)
+    cache_set(cache_key, stages)
+    return stages
 
 # Pokemon type colors 
 TYPE_COLORS = {
@@ -258,19 +274,23 @@ def show_pokemon():
     # If someone visits /pokemon with no query param, send them home
     if not name:
         return redirect(url_for("pokedex_home"))
-    
-    # Call PokeAPI
-    api_url = f"https://pokeapi.co/api/v2/pokemon/{name}"
-    response = requests.get(api_url, timeout = 10)
 
-    # Handle "not found" (or other non-200 responses)
-    if response.status_code != 200:
-        return render_template(
-            "pokemon.html",
-            error=f"No Pokemon found for '{name}'. Try another name.",    
-        )
+    cache_key = f"pokemon:{name}"
+    data = cache_get(cache_key)
+
+    if data is None:
+        # Call PokeAPI
+        api_url = f"https://pokeapi.co/api/v2/pokemon/{name}"
+        response = requests.get(api_url, timeout=10)
+
+        if response.status_code != 200:
+            return render_template(
+                "pokemon.html", 
+                error=f"No Pokemon found for '{name}'. Try another name."
+            )
     
-    data = response.json()
+        data = response.json()
+        cache_set(cache_key, data)
 
     pokemon = {
         "name": data["name"].title(),
@@ -288,7 +308,8 @@ def show_pokemon():
         ],
     }
     
-    frlg_encounters=get_frlg_encounters(name)
+    encounters_url = data.get("location_area_encounters")
+    frlg_encounters = get_frlg_encounters_from_url(encounters_url)
     evolution_stages = get_evolution_chain(name)
 
     # Build per-type style info for the template
@@ -334,7 +355,7 @@ def show_favorites():
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_Name",
+        "SELECT pokemon_name FROM favorites WHERE user_id = ? ORDER BY pokemon_name",
         (session["user_id"],)
     )
     rows = cursor.fetchall()
