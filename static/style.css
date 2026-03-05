@@ -183,6 +183,19 @@ body {
   border-radius: 18px;
 }
 
+/* Retro label font */
+.dex-retro {
+  font-family: "Press Start 2P", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: 0.2px;
+}
+
+/* Slightly smaller for buttons so it doesn’t look cramped */
+.dex-retro-btn {
+  font-family: "Press Start 2P", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1px;
+}
+
 /* ===== Homepage Kanto scroller ===== */
 
 .dex-section-header {
