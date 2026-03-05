@@ -314,3 +314,18 @@ body {
     width: 100%;
   }
 }
+
+@media (max-width: 420px) {
+  /* Make the homepage search form stack on small screens */
+  .dex-search-form {
+    flex-direction: column;
+  }
+
+  .dex-search-form .form-control {
+    width: 100%;
+  }
+
+  .dex-search-form .btn {
+    width: 100%;
+  }
+}
