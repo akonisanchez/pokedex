@@ -271,3 +271,46 @@ body {
   color: rgba(0,0,0,0.7);
   line-height: 1.2;
 }
+
+/* ===== Mobile responsiveness for device header ===== */
+@media (max-width: 768px) {
+  .dex-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 10px 12px;
+  }
+
+  .dex-brand {
+    justify-content: center;
+  }
+
+  .dex-nav {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .dex-auth {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dex-user {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .dex-nav-btn,
+  .dex-auth-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .dex-nav,
+  .dex-auth {
+    width: 100%;
+  }
+}
