@@ -294,8 +294,6 @@ def show_pokemon():
 
     pokemon = {
         "name": data["name"].title(),
-        "height": data["height"],
-        "weight": data["weight"],
         "sprite": data["sprites"] ["front_default"],
 
         # Ex: ["Grass"] or if multiple types ["Grass", "Fighting"]
