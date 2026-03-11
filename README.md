@@ -24,7 +24,7 @@ This app uses SQLite for simplicity. On deployed demo, data (i.e., accounts/favo
 ![Home](docs/home.png)
 
 **Kanto sprite scan**
-![Sprite scan](docs/sprite_scan.gif)
+<img src="docs/sprite_scan.gif" alt="Kanto sprite scan" width="700">
 
 **Search**
 ![Search](docs/search_feature.gif)
