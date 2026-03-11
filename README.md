@@ -36,7 +36,7 @@ This app uses SQLite for simplicity. On deployed demo, data (i.e., accounts/favo
 ![Auth](docs/register_login_display.gif)
 
 **Favorites**
-![Favorites](docs/add_remove_favorites.gif)
+![Favorites](docs/test.gif)
 
 **Evolution chain**
 ![Evolution](docs/evolution_display.gif)
