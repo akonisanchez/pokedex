@@ -1,9 +1,11 @@
 # Pokédex Scanner
 
-A Flask web app built in celebration of Pokémon’s 30th anniversary. It started as a way to practice building a real web product around an external API, then turned into a practical companion for my Pokémon LeafGreen run so I could quickly scan a Pokémon and see key details, evolution stages, and where it can be found in game.
+A Flask web app built in celebration of Pokémon’s 30th anniversary. It started as a way to practice building a real web product around an external API, then turned into a practical companion for my Pokémon LeafGreen run so I could quickly scan a Pokémon and see key details, evolution stages, and where it can be found in game to make team planning a bit easier.
 
 **Live Demo:** https://pokedex-scanner.onrender.com/
 Note: the first load can take a minute if the service is waking up.
+
+[![Pokédex Scanner walkthrough video](https://img.youtube.com/vi/CCI_VVFnKNE/maxresdefault.jpg)](https://youtu.be/CCI_VVFnKNE)
 
 ## Persistence Note (Demo)
 This app uses SQLite for simplicity. On deployed demo, data (i.e., accounts/favorites) may reset after a redeploy or server restart.
@@ -18,28 +20,26 @@ This app uses SQLite for simplicity. On deployed demo, data (i.e., accounts/favo
 * Accounts with register, login, and logout
 * Per user favorites with add and remove flows
 
-## Demo
+## Demo Screenshots
 
 **Home**
 ![Home](docs/home.png)
 
-**Kanto sprite scan**
-<img src="docs/sprite_scan.gif" alt="Kanto sprite scan" width="700">
+**Register**
+![Register](docs/register.png)
 
-**Search**
-![Search](docs/search_feature.gif)
+**Login**
+![Login](docs/login.png)
 
-**Wild Encounter**
-![Wild encounter](docs/wild_encounter.gif)
-
-**Register and login**
-![Auth](docs/register_login_display.gif)
+**Logged in user state**
+![Logged in user](docs/logged_in_user.png)
 
 **Favorites**
-![Favorites](docs/add_remove_favorites.gif)
+![Favorites](docs/favorites.png)
 
-**Evolution chain**
-![Evolution](docs/evolution_display.gif)
+**Pokemon search results**
+![Pokemon search results](docs/pokemon_results.png)
+
 
 ## Tech Stack
 
