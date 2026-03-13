@@ -3,6 +3,7 @@
 A Flask web app built in celebration of Pokémon’s 30th anniversary. It started as a way to practice building a real web product around an external API, then turned into a practical companion for my Pokémon LeafGreen run so I could quickly scan a Pokémon and see key details, evolution stages, and where it can be found in game to make team planning a bit easier.
 
 **Live Demo:** https://pokedex-scanner.onrender.com/
+
 Note: the first load can take a minute if the service is waking up.
 
 ### ▶ Walkthrough video
