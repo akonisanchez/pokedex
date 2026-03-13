@@ -5,7 +5,8 @@ A Flask web app built in celebration of Pokémon’s 30th anniversary. It starte
 **Live Demo:** https://pokedex-scanner.onrender.com/
 Note: the first load can take a minute if the service is waking up.
 
-[![Pokédex Scanner walkthrough video](https://img.youtube.com/vi/CCI_VVFnKNE/maxresdefault.jpg)](https://youtu.be/CCI_VVFnKNE)
+### ▶ Walkthrough video
+[![Watch the walkthrough on YouTube](https://img.youtube.com/vi/CCI_VVFnKNE/0.jpg)](https://youtu.be/CCI_VVFnKNE)
 
 ## Persistence Note (Demo)
 This app uses SQLite for simplicity. On deployed demo, data (i.e., accounts/favorites) may reset after a redeploy or server restart.
