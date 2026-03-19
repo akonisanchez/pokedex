@@ -1,18 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
-from db import init_db, get_conn
-from cache_utils import cache_get, cache_set
-from pokeapi import load_kanto_pokemon, get_frlg_encounters_from_url, get_evolution_chain
-
-from pokemon_helpers import TYPE_COLORS, text_color_for_bg
-
-import random
-import requests
-import sqlite3
-import os
 import json
+import os
+import random
+import sqlite3
 from pathlib import Path
 
+import requests
+from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from cache_utils import cache_get, cache_set
+from db import init_db, get_conn
+from pokeapi import load_kanto_pokemon, get_frlg_encounters_from_url, get_evolution_chain
+from pokemon_helpers import TYPE_COLORS, text_color_for_bg
 
 app = Flask(__name__)
 
