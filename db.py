@@ -7,10 +7,11 @@ def get_conn():
     """
     Return a DB connection.
 
-    SQLite file (local).
-    Later will switch to function to Postgres without touching app routes.
+    Keeping database access centralized here makes it easier to
+    swap database implementations later without rewriting route logic.
     """
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
