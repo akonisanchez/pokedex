@@ -1,16 +1,16 @@
-/* Pokédex-inspo*/
+/* Base theme */
 body {
   background: #f6f7fb;
 }
 
 .pokedex-nav {
-  background: #d32f2f; /* Pokédex red */
+  background: #d32f2f;
 }
 
 .pokedex-card {
   border: 2px solid #e0e0e0;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
 .sprite {
@@ -23,8 +23,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* ===== Pokédex Device UI ===== */
-
+/* Pokédex device layout */
 .dex-page {
   min-height: 100vh;
   display: grid;
@@ -37,18 +36,18 @@ body {
   width: min(1100px, 96vw);
   border-radius: 26px;
   background: linear-gradient(180deg, #d32f2f, #a31212);
-  box-shadow: 0 22px 70px rgba(0,0,0,0.22);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
   padding: 16px;
   position: relative;
 }
 
-/* subtle inner bezel */
+/* Inner bezel */
 .dex-device::before {
   content: "";
   position: absolute;
   inset: 12px;
   border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.20);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   pointer-events: none;
 }
 
@@ -73,7 +72,7 @@ body {
   height: 10px;
   border-radius: 999px;
   background: #29b6f6;
-  box-shadow: 0 0 14px rgba(41,182,246,0.75);
+  box-shadow: 0 0 14px rgba(41, 182, 246, 0.75);
 }
 
 .dex-brand-title {
@@ -87,7 +86,7 @@ body {
   opacity: 0.85;
 }
 
-/* Nav buttons */
+/* Navigation */
 .dex-nav {
   display: flex;
   gap: 8px;
@@ -98,8 +97,8 @@ body {
 .dex-nav-btn {
   text-decoration: none;
   color: #111;
-  background: rgba(255,255,255,0.82);
-  border: 1px solid rgba(0,0,0,0.14);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(0, 0, 0, 0.14);
   padding: 7px 11px;
   border-radius: 12px;
   font-weight: 700;
@@ -110,7 +109,7 @@ body {
   background: #fff;
 }
 
-/* Auth area */
+/* Auth controls */
 .dex-auth {
   display: flex;
   align-items: center;
@@ -118,9 +117,9 @@ body {
 }
 
 .dex-user {
-  color: rgba(255,255,255,0.95);
+  color: rgba(255, 255, 255, 0.95);
   font-size: 0.9rem;
-  background: rgba(0,0,0,0.16);
+  background: rgba(0, 0, 0, 0.16);
   padding: 6px 10px;
   border-radius: 999px;
   white-space: nowrap;
@@ -129,8 +128,8 @@ body {
 .dex-auth-btn {
   text-decoration: none;
   color: #fff;
-  background: rgba(17,24,39,0.92);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(17, 24, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 7px 11px;
   border-radius: 12px;
   font-weight: 800;
@@ -143,7 +142,7 @@ body {
 
 /* Screen */
 .dex-screen-wrap {
-  background: rgba(0,0,0,0.18);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 20px;
   padding: 14px;
 }
@@ -151,23 +150,23 @@ body {
 .dex-screen {
   border-radius: 16px;
   background: linear-gradient(180deg, #fbfcff, #f0f4ff);
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.12);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   position: relative;
 }
 
-/* subtle glass + scanlines */
+/* Screen glass and scanline effect */
 .dex-screen::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 35%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 35%),
     repeating-linear-gradient(
       to bottom,
-      rgba(0,0,0,0.015),
-      rgba(0,0,0,0.015) 2px,
-      rgba(255,255,255,0.01) 4px
+      rgba(0, 0, 0, 0.015),
+      rgba(0, 0, 0, 0.015) 2px,
+      rgba(255, 255, 255, 0.01) 4px
     );
   pointer-events: none;
 }
@@ -178,26 +177,19 @@ body {
   z-index: 1;
 }
 
-/* Make existing cards look nicer inside the screen */
-.pokedex-card {
-  border-radius: 18px;
-}
-
-/* Retro label font */
+/* Retro font helpers */
 .dex-retro {
   font-family: "Press Start 2P", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   letter-spacing: 0.2px;
 }
 
-/* Slightly smaller for buttons so it doesn’t look cramped */
 .dex-retro-btn {
   font-family: "Press Start 2P", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-size: 0.75rem;
   letter-spacing: 0.1px;
 }
 
-/* ===== Homepage Kanto scroller ===== */
-
+/* Homepage Kanto scroller */
 .dex-section-header {
   display: flex;
   align-items: baseline;
@@ -214,27 +206,27 @@ body {
 
 .dex-section-sub {
   margin: 0;
-  color: rgba(0,0,0,0.55);
+  color: rgba(0, 0, 0, 0.55);
   font-size: 0.95rem;
 }
 
-/* horizontal scroll row */
 .dex-scroller {
   display: flex;
   gap: 10px;
   overflow-x: auto;
   padding: 10px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.6);
-  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   scroll-snap-type: x mandatory;
 }
 
 .dex-scroller::-webkit-scrollbar {
   height: 10px;
 }
+
 .dex-scroller::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.18);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 999px;
 }
 
@@ -246,15 +238,15 @@ body {
   border-radius: 14px;
   padding: 10px 8px;
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.10);
-  box-shadow: 0 10px 18px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.05);
   scroll-snap-align: start;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
 .dex-sprite-tile:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 22px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.08);
 }
 
 .dex-sprite {
@@ -268,11 +260,11 @@ body {
 .dex-sprite-label {
   font-size: 0.85rem;
   text-align: center;
-  color: rgba(0,0,0,0.7);
+  color: rgba(0, 0, 0, 0.7);
   line-height: 1.2;
 }
 
-/* ===== Mobile responsiveness for device header ===== */
+/* Responsive */
 @media (max-width: 768px) {
   .dex-header {
     flex-direction: column;
@@ -303,28 +295,22 @@ body {
 }
 
 @media (max-width: 420px) {
+  .dex-nav,
+  .dex-auth {
+    width: 100%;
+  }
+
   .dex-nav-btn,
   .dex-auth-btn {
     width: 100%;
     text-align: center;
   }
 
-  .dex-nav,
-  .dex-auth {
-    width: 100%;
-  }
-}
-
-@media (max-width: 420px) {
-  /* Make the homepage search form stack on small screens */
   .dex-search-form {
     flex-direction: column;
   }
 
-  .dex-search-form .form-control {
-    width: 100%;
-  }
-
+  .dex-search-form .form-control,
   .dex-search-form .btn {
     width: 100%;
   }
